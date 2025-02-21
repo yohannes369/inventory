@@ -12,3 +12,4 @@ CREATE TABLE users (
     reg_date DATE NOT NULL,             -- Registration date
     status INT DEFAULT 2 NOT NULL       -- Status (default value is 2)
 );
+hh
