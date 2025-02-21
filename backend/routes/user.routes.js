@@ -7,8 +7,8 @@ const authRoutes = (Db) => {
     const router = Router();
 
     // POST endpoint to add a new user
-    router.post("/add-user", (req, res) => addUser(req, res));
-    router.post("/login-user", (req, res) => loginUser(req, res));
+    router.post("/add-user",  addUser)
+    router.post("/login-user", loginUser)
 
     return router;
 };

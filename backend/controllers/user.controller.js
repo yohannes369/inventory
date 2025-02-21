@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt"; // Import bcrypt for password hashing
 import Db from "../db/conndb.js"; // Import the database connection
+import jwt from "jsonwebtoken"; // Import jwt for token generation
 export const addUser = async (req, res) => {
-    const { emp_id, account_type, password, fname, lname, email, phone_no, block_no, office_no, reg_date, status } = req.body;
+    const { emp_id, role, password, fname, lname, email, phone_no, block_no, office_no, reg_date, status } = req.body;
 
     // Validate required fields
-    if (!emp_id || !account_type || !password || !fname || !lname || !email || !phone_no || !block_no || !office_no || !reg_date || !status) {
+    if (!emp_id || !role || !password || !fname || !lname || !email || !phone_no || !block_no || !office_no || !reg_date || !status) {
         return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -25,8 +26,8 @@ export const addUser = async (req, res) => {
     // Insert the user into the database
     try {
         const [rows] = await Db.execute(
-            "INSERT INTO users (emp_id, account_type, password, fname, lname, email, phone_no, block_no, office_no, reg_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [emp_id, account_type, hashedPassword, fname, lname, email, phone_no, block_no, office_no, reg_date, status]
+            "INSERT INTO users (emp_id, role, password, fname, lname, email, phone_no, block_no, office_no, reg_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [emp_id, role, hashedPassword, fname, lname, email, phone_no, block_no, office_no, reg_date, status]
         );
 
         if (rows.affectedRows === 1) {
@@ -56,7 +57,7 @@ export const loginUser = async (req, res) => {
     try {
         const [rows] = await Db.execute(
             "SELECT * FROM users WHERE emp_id = ?",
-            [emp_id]
+            [emp_id],  
         );
 
         if (rows.length === 0) {
@@ -73,6 +74,11 @@ export const loginUser = async (req, res) => {
 
         // User authentication successful
         return res.status(200).json({ message: "Login successful" });
+
+
+        const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
     } catch (err) {    
         console.error("Database error:", err);
         return res.status(500).json({ message: "Failed to login user" });
