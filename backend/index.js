@@ -1,7 +1,13 @@
 import express from "express";
+import cors from "cors";
 import Db from "./db/conndb.js"; // Import the database connection
+import authRoutes from "./routes/user.routes.js"; // Import the authRoutes function
 
 const app = express();
+
+// Middleware
+app.use(cors()); // Enable CORS
+app.use(express.json()); // Parse JSON request bodies
 
 // Test the database connection when the server starts
 (async () => {
@@ -14,7 +20,11 @@ const app = express();
     }
 })();
 
+// Routes
+app.use("/api/auth", authRoutes(Db)); // Pass the Db instance to authRoutes
+
 // Start the server
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
